@@ -98,7 +98,16 @@ class RealESRGANPipeline(Pipeline):
             x = x.permute(2, 0, 1).unsqueeze(0)
             x = x.to(self.device, self.dtype)
 
+            _, _, h, w = x.shape
+            pad_h = (2 - h % 2) % 2
+            pad_w = (2 - w % 2) % 2
+            if pad_h or pad_w:
+                x = torch.nn.functional.pad(x, (0, pad_w, 0, pad_h), mode="reflect")
+
             out = self.model(x)
+
+            if pad_h or pad_w:
+                out = out[:, :, : h * 2, : w * 2]
 
             # (1, C, 2H, 2W) → (2H, 2W, C) float [0,1]
             out = out.squeeze(0).permute(1, 2, 0).clamp(0, 1).float()
