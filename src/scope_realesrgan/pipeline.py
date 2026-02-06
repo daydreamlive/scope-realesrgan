@@ -118,10 +118,11 @@ class RealESRGANPipeline(Pipeline):
             output_frames.append(out)
 
         elapsed_ms = (time.perf_counter() - t0) * 1000
-        logger.info(
-            f"realesrgan: {len(video)} frame(s), "
+        print(
+            f"[realesrgan] {len(video)} frame(s), "
             f"{h}x{w} -> {h*2}x{w*2}, "
-            f"{elapsed_ms:.1f}ms ({1000/max(elapsed_ms,1):.1f} FPS)"
+            f"{elapsed_ms:.1f}ms ({1000/max(elapsed_ms,1):.1f} FPS)",
+            flush=True,
         )
 
         return {"video": torch.stack(output_frames, dim=0)}
