@@ -2,7 +2,7 @@
 name = "scope-realesrgan"
 version = "0.1.0"
 description = "Real-ESRGAN 2x super resolution postprocessor for Daydream Scope"
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 license = "Apache-2.0"
 dependencies = []
 
