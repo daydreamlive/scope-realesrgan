@@ -75,14 +75,16 @@ class RealESRGANPipeline(Pipeline):
 
         model.load_state_dict(state_dict, strict=True)
         model.eval().to(self.device, self.dtype)
-        self.model = torch.compile(model)
-        logger.info("Real-ESRGAN x2plus loaded and compiled")
+        self.model = model
+        logger.info("Real-ESRGAN x2plus loaded successfully")
 
     def prepare(self, **kwargs) -> Requirements:
         return Requirements(input_size=1)
 
     @torch.inference_mode()
     def __call__(self, **kwargs) -> dict:
+        import time
+
         video = kwargs.get("video")
 
         if video is None:
@@ -91,6 +93,7 @@ class RealESRGANPipeline(Pipeline):
         if isinstance(video, list):
             video = normalize_frame_sizes(video)
 
+        t0 = time.perf_counter()
         output_frames = []
         for frame in video:
             # (1, H, W, C) uint8 [0,255] → (1, C, H, W) float [0,1]
@@ -105,6 +108,7 @@ class RealESRGANPipeline(Pipeline):
                 x = torch.nn.functional.pad(x, (0, pad_w, 0, pad_h), mode="reflect")
 
             out = self.model(x)
+            torch.cuda.synchronize()
 
             if pad_h or pad_w:
                 out = out[:, :, : h * 2, : w * 2]
@@ -112,5 +116,12 @@ class RealESRGANPipeline(Pipeline):
             # (1, C, 2H, 2W) → (2H, 2W, C) float [0,1]
             out = out.squeeze(0).permute(1, 2, 0).clamp(0, 1).float()
             output_frames.append(out)
+
+        elapsed_ms = (time.perf_counter() - t0) * 1000
+        logger.info(
+            f"realesrgan: {len(video)} frame(s), "
+            f"{h}x{w} -> {h*2}x{w*2}, "
+            f"{elapsed_ms:.1f}ms ({1000/max(elapsed_ms,1):.1f} FPS)"
+        )
 
         return {"video": torch.stack(output_frames, dim=0)}
