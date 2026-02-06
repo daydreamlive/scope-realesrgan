@@ -1,6 +1,6 @@
 """Configuration schema for Real-ESRGAN super resolution pipeline."""
 
-from scope.core.pipelines.base_schema import BasePipelineConfig, ModeDefaults
+from scope.core.pipelines.base_schema import BasePipelineConfig, ModeDefaults, UsageType
 
 
 class RealESRGANConfig(BasePipelineConfig):
@@ -26,6 +26,6 @@ class RealESRGANConfig(BasePipelineConfig):
     modified = False
     estimated_vram_gb = 0.3
 
-    usage = []
+    usage = [UsageType.POSTPROCESSOR]
 
     modes = {"video": ModeDefaults(default=True)}

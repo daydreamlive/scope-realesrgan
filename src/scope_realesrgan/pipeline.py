@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 import torch
 
 from scope.core.pipelines.interface import Pipeline, Requirements
+from scope.core.pipelines.process import normalize_frame_sizes
 
 from .arch import RRDBNet
 from .schema import RealESRGANConfig
@@ -87,8 +88,8 @@ class RealESRGANPipeline(Pipeline):
         if video is None:
             raise ValueError("Input 'video' cannot be None for RealESRGANPipeline")
 
-        if not isinstance(video, list):
-            video = [video]
+        if isinstance(video, list):
+            video = normalize_frame_sizes(video)
 
         output_frames = []
         for frame in video:
