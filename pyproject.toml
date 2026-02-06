@@ -1,0 +1,23 @@
+[project]
+name = "scope-realesrgan"
+version = "0.1.0"
+description = "Real-ESRGAN 2x super resolution postprocessor for Daydream Scope"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+dependencies = []
+
+[project.entry-points.scope]
+realesrgan = "scope_realesrgan"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/scope_realesrgan"]
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
