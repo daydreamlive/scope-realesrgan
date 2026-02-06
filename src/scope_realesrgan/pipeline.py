@@ -35,7 +35,7 @@ class RealESRGANPipeline(Pipeline):
         self,
         config=None,
         device=None,
-        dtype=torch.float16,
+        dtype=torch.float32,
         **kwargs,
     ):
         if config is not None:
