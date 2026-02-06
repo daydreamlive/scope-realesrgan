@@ -35,7 +35,7 @@ class RealESRGANPipeline(Pipeline):
         self,
         config=None,
         device=None,
-        dtype=torch.float32,
+        dtype=torch.bfloat16,
         **kwargs,
     ):
         if config is not None:
@@ -75,8 +75,8 @@ class RealESRGANPipeline(Pipeline):
 
         model.load_state_dict(state_dict, strict=True)
         model.eval().to(self.device, self.dtype)
-        self.model = model
-        logger.info("Real-ESRGAN x2plus loaded successfully")
+        self.model = torch.compile(model)
+        logger.info("Real-ESRGAN x2plus loaded and compiled")
 
     def prepare(self, **kwargs) -> Requirements:
         return Requirements(input_size=1)
